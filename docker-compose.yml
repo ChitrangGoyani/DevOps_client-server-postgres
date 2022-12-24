@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  client:
+    container_name: client
+    build: ./dummy_for_devops
+    ports:
+      - '3000:3000'
+    command: npm run start
+
+  server:
+    container_name: server
+    build: ./nodeserver
+    ports:
+      - '3050:3050'
+    depends_on:
+      - db
+    command: npm run start
+
+  db:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=student
+    volumes: 
+      - ./postgres-data:/var/lib/postgresql/data
+      # copy the sql script to create tables
+      - ./postgres/db_setup.sql:/docker-entrypoint-initdb.d/db_setup.sql
